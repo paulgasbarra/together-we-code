@@ -36,8 +36,8 @@ interface Session {
 }
 
 export default function CodeSession() {
-  const { id } = useParams();
-  const sessionId = parseInt(id);
+  const { id } = useParams<{ id: string }>();
+  const sessionId = parseInt(id || "0");
   const { user } = useUser();
   const { toast } = useToast();
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
@@ -162,6 +162,63 @@ export default function CodeSession() {
                 </TabsList>
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
                   <ScrollArea className="h-full">
+                    {user?.role === "teacher" && (
+                      <Card className="m-2">
+                        <CardHeader>
+                          <CardTitle className="text-lg flex items-center justify-between">
+                            <span>Create New Question</span>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                const title = prompt("Enter question title:");
+                                const description = prompt("Enter question description:");
+                                const testCases = prompt("Enter test cases (JSON format):");
+                                
+                                if (title && description && testCases) {
+                                  try {
+                                    const parsedTestCases = JSON.parse(testCases);
+                                    fetch(`/api/sessions/${sessionId}/questions`, {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({
+                                        title,
+                                        description,
+                                        testCases: parsedTestCases
+                                      }),
+                                      credentials: "include"
+                                    })
+                                    .then(res => {
+                                      if (!res.ok) throw new Error("Failed to create question");
+                                      queryClient.invalidateQueries({ queryKey: [`/api/sessions/${sessionId}/questions`] });
+                                      toast({
+                                        title: "Success",
+                                        description: "Question created successfully"
+                                      });
+                                    })
+                                    .catch(err => {
+                                      toast({
+                                        title: "Error",
+                                        description: err.message,
+                                        variant: "destructive"
+                                      });
+                                    });
+                                  } catch (err) {
+                                    toast({
+                                      title: "Error",
+                                      description: "Invalid test cases JSON",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                }
+                              }}
+                            >
+                              Add Question
+                            </Button>
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>
+                    )}
                     {questions?.map((question) => (
                       <Card
                         key={question.id}

@@ -164,9 +164,9 @@ export default function TeacherDashboard() {
                   <Code className="h-4 w-4 mr-2" />
                   View Session
                 </Button>
-                <Button variant="secondary">
+                <Button variant="secondary" onClick={() => setLocation(`/session/${session.id}`)}>
                   <Users className="h-4 w-4 mr-2" />
-                  Participants
+                  Enter Session
                 </Button>
               </div>
             </CardContent>

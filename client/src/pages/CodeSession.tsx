@@ -74,7 +74,8 @@ export default function CodeSession() {
       userId: number;
     }) => {
       if (
-        data.questionId === activeQuestion?.id &&
+        session?.question &&
+        data.questionId === session.question.id &&
         data.userId !== user?.id
       ) {
         setCode(data.code);
@@ -85,7 +86,7 @@ export default function CodeSession() {
       questionId: number;
       status: string;
     }) => {
-      if (data.questionId === activeQuestion?.id) {
+      if (session?.question && data.questionId === session.question.id) {
         toast({
           title: "Test Results",
           description: `Tests ${data.status}`,
@@ -96,30 +97,30 @@ export default function CodeSession() {
 
     onCodeChange(handleCodeChange);
     onSubmissionResult(handleSubmissionResult);
-  }, [activeQuestion?.id, user?.id]);
+  }, [session?.question?.id, user?.id]);
 
   const handleCodeChange = (value: string = "") => {
     setCode(value);
-    if (activeQuestion) {
+    if (session?.question) {
       updateCode({
         sessionId,
-        questionId: activeQuestion.id,
+        questionId: session.question.id,
         code: value,
       });
     }
   };
 
   const handleRunTests = () => {
-    if (activeQuestion) {
+    if (session?.question) {
       submitAnswer({
         sessionId,
-        questionId: activeQuestion.id,
+        questionId: session.question.id,
         code,
       });
     }
   };
 
-  if (isLoadingSession || isLoadingQuestions) {
+  if (isLoadingSession) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -193,14 +194,14 @@ export default function CodeSession() {
               <ResizablePanel defaultSize={50}>
                 <Card className="h-full rounded-none border-0">
                   <CardHeader>
-                    <CardTitle>{activeQuestion?.title}</CardTitle>
+                    <CardTitle>{session?.question?.title}</CardTitle>
                     <CardDescription>
-                      {activeQuestion?.description}
+                      {session?.question?.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <pre className="bg-muted p-4 rounded-lg">
-                      {JSON.stringify(activeQuestion?.testCases, null, 2)}
+                      {JSON.stringify(session?.question?.testCases, null, 2)}
                     </pre>
                   </CardContent>
                 </Card>

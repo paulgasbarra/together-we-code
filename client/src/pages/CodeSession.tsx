@@ -154,7 +154,7 @@ export default function CodeSession() {
               <Tabs defaultValue="questions" className="h-full">
                 <TabsList className="w-full">
                   <TabsTrigger value="questions" className="flex-1">
-                    Questions
+                    Question
                   </TabsTrigger>
                   <TabsTrigger value="chat" className="flex-1">
                     Chat
@@ -162,80 +162,24 @@ export default function CodeSession() {
                 </TabsList>
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
                   <ScrollArea className="h-full">
-                    {user?.role === "teacher" && (
+                    {activeQuestion && (
                       <Card className="m-2">
                         <CardHeader>
-                          <CardTitle className="text-lg flex items-center justify-between">
-                            <span>Create New Question</span>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                const title = prompt("Enter question title:");
-                                const description = prompt("Enter question description:");
-                                const testCases = prompt("Enter test cases (JSON format):");
-                                
-                                if (title && description && testCases) {
-                                  try {
-                                    const parsedTestCases = JSON.parse(testCases);
-                                    fetch(`/api/sessions/${sessionId}/questions`, {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        title,
-                                        description,
-                                        testCases: parsedTestCases
-                                      }),
-                                      credentials: "include"
-                                    })
-                                    .then(res => {
-                                      if (!res.ok) throw new Error("Failed to create question");
-                                      queryClient.invalidateQueries({ queryKey: [`/api/sessions/${sessionId}/questions`] });
-                                      toast({
-                                        title: "Success",
-                                        description: "Question created successfully"
-                                      });
-                                    })
-                                    .catch(err => {
-                                      toast({
-                                        title: "Error",
-                                        description: err.message,
-                                        variant: "destructive"
-                                      });
-                                    });
-                                  } catch (err) {
-                                    toast({
-                                      title: "Error",
-                                      description: "Invalid test cases JSON",
-                                      variant: "destructive"
-                                    });
-                                  }
-                                }
-                              }}
-                            >
-                              Add Question
-                            </Button>
-                          </CardTitle>
+                          <CardTitle>{activeQuestion.title}</CardTitle>
+                          <CardDescription>
+                            {activeQuestion.description}
+                          </CardDescription>
                         </CardHeader>
+                        <CardContent>
+                          <div className="bg-muted rounded-lg p-4">
+                            <Label>Test Cases:</Label>
+                            <pre className="text-xs mt-2 overflow-auto">
+                              {JSON.stringify(activeQuestion.testCases, null, 2)}
+                            </pre>
+                          </div>
+                        </CardContent>
                       </Card>
                     )}
-                    {questions?.map((question) => (
-                      <Card
-                        key={question.id}
-                        className={`m-2 cursor-pointer transition-colors ${
-                          activeQuestion?.id === question.id
-                            ? "border-primary"
-                            : ""
-                        }`}
-                        onClick={() => setActiveQuestion(question)}
-                      >
-                        <CardHeader>
-                          <CardTitle className="text-lg">
-                            {question.title}
-                          </CardTitle>
-                        </CardHeader>
-                      </Card>
-                    ))}
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value="chat" className="p-4">

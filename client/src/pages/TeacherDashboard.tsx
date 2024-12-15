@@ -274,6 +274,12 @@ export default function TeacherDashboard() {
                   <p className="text-sm text-muted-foreground mb-4">
                     {session.description || "No description provided"}
                   </p>
+                  {session.question && (
+                    <div className="bg-muted rounded p-2">
+                      <p className="font-medium">Selected Question:</p>
+                      <p className="text-sm text-muted-foreground">{session.question.title}</p>
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Button

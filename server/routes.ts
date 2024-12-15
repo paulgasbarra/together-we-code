@@ -103,23 +103,34 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/sessions", requireAuth, async (req, res) => {
     try {
-      let query = db.select().from(sessions);
+      let query = db.query.sessions.findMany({
+        with: {
+          question: true
+        }
+      });
       
-      if (req.user.role === "student") {
-        query = query.innerJoin(
-          sessionParticipants,
-          and(
-            eq(sessions.id, sessionParticipants.sessionId),
-            eq(sessionParticipants.userId, req.user.id)
-          )
-        );
-      } else if (req.user.role === "teacher") {
-        query = query.where(eq(sessions.teacherId, req.user.id));
+      if (req.user?.role === "student") {
+        query = db.query.sessions.findMany({
+          with: {
+            question: true,
+            participants: {
+              where: eq(sessionParticipants.userId, req.user.id)
+            }
+          }
+        });
+      } else if (req.user?.role === "teacher") {
+        query = db.query.sessions.findMany({
+          with: {
+            question: true
+          },
+          where: eq(sessions.teacherId, req.user.id)
+        });
       }
 
       const result = await query;
       res.json(result);
     } catch (error) {
+      console.error("Error fetching sessions:", error);
       res.status(500).send("Failed to fetch sessions");
     }
   });

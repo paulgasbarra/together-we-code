@@ -29,10 +29,18 @@ interface Question {
   testCases: any[];
 }
 
+interface Question {
+  id: number;
+  title: string;
+  description: string;
+  testCases: any[];
+}
+
 interface Session {
   id: number;
   title: string;
   description: string | null;
+  question: Question;
 }
 
 export default function CodeSession() {
@@ -40,7 +48,6 @@ export default function CodeSession() {
   const sessionId = parseInt(id || "0");
   const { user } = useUser();
   const { toast } = useToast();
-  const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [code, setCode] = useState("");
   const {
     joinSession,
@@ -54,21 +61,11 @@ export default function CodeSession() {
     queryKey: [`/api/sessions/${sessionId}`],
   });
 
-  const { data: questions, isLoading: isLoadingQuestions } = useQuery<Question[]>({
-    queryKey: [`/api/sessions/${sessionId}/questions`],
-  });
-
   useEffect(() => {
     if (sessionId) {
       joinSession(sessionId);
     }
   }, [sessionId]);
-
-  useEffect(() => {
-    if (questions?.length) {
-      setActiveQuestion(questions[0]);
-    }
-  }, [questions]);
 
   useEffect(() => {
     const handleCodeChange = (data: {
@@ -162,19 +159,19 @@ export default function CodeSession() {
                 </TabsList>
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
                   <ScrollArea className="h-full">
-                    {activeQuestion && (
+                    {session?.question && (
                       <Card className="m-2">
                         <CardHeader>
-                          <CardTitle>{activeQuestion.title}</CardTitle>
+                          <CardTitle>{session.question.title}</CardTitle>
                           <CardDescription>
-                            {activeQuestion.description}
+                            {session.question.description}
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="bg-muted rounded-lg p-4">
-                            <Label>Test Cases:</Label>
+                            <div className="font-medium mb-2">Test Cases:</div>
                             <pre className="text-xs mt-2 overflow-auto">
-                              {JSON.stringify(activeQuestion.testCases, null, 2)}
+                              {JSON.stringify(session.question.testCases, null, 2)}
                             </pre>
                           </div>
                         </CardContent>

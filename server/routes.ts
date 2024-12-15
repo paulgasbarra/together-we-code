@@ -157,6 +157,26 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/sessions/:sessionId", requireAuth, async (req, res) => {
+    try {
+      const result = await db.query.sessions.findFirst({
+        where: eq(sessions.id, parseInt(req.params.sessionId)),
+        with: {
+          question: true
+        }
+      });
+
+      if (!result) {
+        return res.status(404).send("Session not found");
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching session:", error);
+      res.status(500).send("Failed to fetch session");
+    }
+  });
+
   app.get("/api/sessions/:sessionId/questions", requireAuth, async (req, res) => {
     try {
       const sessionQuestions = await db

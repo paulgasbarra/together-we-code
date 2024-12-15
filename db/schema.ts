@@ -15,6 +15,7 @@ export const sessions = pgTable("sessions", {
   title: text("title").notNull(),
   description: text("description"),
   teacherId: integer("teacher_id").references(() => users.id).notNull(),
+  questionId: integer("question_id").references(() => questions.id).notNull(),
   startTime: timestamp("start_time").notNull().defaultNow(),
   endTime: timestamp("end_time"),
   isActive: boolean("is_active").notNull().default(true),
@@ -23,7 +24,6 @@ export const sessions = pgTable("sessions", {
 
 export const questions = pgTable("questions", {
   id: serial("id").primaryKey(),
-  sessionId: integer("session_id").references(() => sessions.id).notNull(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   testCases: json("test_cases").notNull(),
@@ -53,15 +53,14 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
     fields: [sessions.teacherId],
     references: [users.id]
   }),
-  questions: many(questions),
+  question: one(questions, {
+    fields: [sessions.questionId],
+    references: [questions.id]
+  }),
   participants: many(sessionParticipants)
 }));
 
-export const questionsRelations = relations(questions, ({ one, many }) => ({
-  session: one(sessions, {
-    fields: [questions.sessionId],
-    references: [sessions.id]
-  }),
+export const questionsRelations = relations(questions, ({ many }) => ({
   submissions: many(submissions)
 }));
 

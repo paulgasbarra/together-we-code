@@ -70,8 +70,7 @@ export function registerRoutes(app: Express): Server {
         .values({
           title,
           description,
-          testCases,
-          sessionId: null
+          testCases
         })
         .returning();
 

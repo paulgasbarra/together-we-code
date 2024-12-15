@@ -28,13 +28,49 @@ export function registerRoutes(app: Express): Server {
         .values({
           title: req.body.title,
           description: req.body.description,
-          teacherId: req.user.id
+          teacherId: req.user.id,
+          questionId: req.body.questionId
         })
         .returning();
 
       res.json(session);
     } catch (error) {
       res.status(500).send("Failed to create session");
+    }
+  });
+
+  // Questions API
+  app.get("/api/questions", requireAuth, async (req, res) => {
+    try {
+      const questionsList = await db
+        .select()
+        .from(questions)
+        .orderBy(questions.createdAt);
+
+      res.json(questionsList);
+    } catch (error) {
+      res.status(500).send("Failed to fetch questions");
+    }
+  });
+
+  app.post("/api/questions", requireAuth, async (req, res) => {
+    try {
+      if (req.user.role !== "teacher") {
+        return res.status(403).send("Only teachers can create questions");
+      }
+
+      const [question] = await db.insert(questions)
+        .values({
+          title: req.body.title,
+          description: req.body.description,
+          testCases: req.body.testCases,
+          sessionId: null // Questions are now created independently of sessions
+        })
+        .returning();
+
+      res.json(question);
+    } catch (error) {
+      res.status(500).send("Failed to create question");
     }
   });
 

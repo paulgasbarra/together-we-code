@@ -56,10 +56,15 @@ export default function TeacherDashboard() {
     description: "",
     questionId: 0,
   });
+  interface TestCase {
+    input: string;
+    expected: string;
+  }
+
   const [newQuestion, setNewQuestion] = useState({
     title: "",
     description: "",
-    testCases: "[]",
+    testCases: [{ input: "", expected: "" }] as TestCase[],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({
@@ -78,7 +83,7 @@ export default function TeacherDashboard() {
         credentials: "include",
         body: JSON.stringify({
           ...questionData,
-          testCases: JSON.parse(questionData.testCases),
+          testCases: questionData.testCases,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -315,17 +320,81 @@ export default function TeacherDashboard() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="testCases">Test Cases (JSON format)</Label>
-                    <Textarea
-                      id="testCases"
-                      value={newQuestion.testCases}
-                      onChange={(e) =>
-                        setNewQuestion({ ...newQuestion, testCases: e.target.value })
-                      }
-                      placeholder='[{"input": "2", "expected": "2"}, {"input": "3", "expected": "6"}]'
-                      required
-                    />
+                  <div className="space-y-4">
+                    <Label>Test Cases</Label>
+                    {newQuestion.testCases.map((testCase, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <Label htmlFor={`input-${index}`}>Input</Label>
+                            <Input
+                              id={`input-${index}`}
+                              value={testCase.input}
+                              onChange={(e) => {
+                                const updatedTestCases = [...newQuestion.testCases];
+                                updatedTestCases[index] = {
+                                  ...testCase,
+                                  input: e.target.value,
+                                };
+                                setNewQuestion({
+                                  ...newQuestion,
+                                  testCases: updatedTestCases,
+                                });
+                              }}
+                              placeholder="Example: 5"
+                              required
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <Label htmlFor={`expected-${index}`}>Expected Output</Label>
+                            <Input
+                              id={`expected-${index}`}
+                              value={testCase.expected}
+                              onChange={(e) => {
+                                const updatedTestCases = [...newQuestion.testCases];
+                                updatedTestCases[index] = {
+                                  ...testCase,
+                                  expected: e.target.value,
+                                };
+                                setNewQuestion({
+                                  ...newQuestion,
+                                  testCases: updatedTestCases,
+                                });
+                              }}
+                              placeholder="Example: 120"
+                              required
+                            />
+                          </div>
+                          {newQuestion.testCases.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="self-end"
+                              onClick={() => {
+                                setNewQuestion({
+                                  ...newQuestion,
+                                  testCases: newQuestion.testCases.filter((_, i) => i !== index),
+                                });
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setNewQuestion({
+                          ...newQuestion,
+                          testCases: [...newQuestion.testCases, { input: "", expected: "" }],
+                        });
+                      }}
+                    >
+                      Add Test Case
+                    </Button>
                   </div>
                   <Button type="submit" className="w-full">
                     {createQuestion.isPending ? (

@@ -20,22 +20,41 @@ export function registerRoutes(app: Express): Server {
   // Sessions
   app.post("/api/sessions", requireAuth, async (req, res) => {
     try {
-      if (req.user.role !== "teacher") {
+      if (req.user?.role !== "teacher") {
         return res.status(403).send("Only teachers can create sessions");
+      }
+
+      const { title, description, questionId } = req.body;
+
+      if (!title || !questionId) {
+        return res.status(400).send("Title and question selection are required");
+      }
+
+      // Verify question exists
+      const [question] = await db
+        .select()
+        .from(questions)
+        .where(eq(questions.id, questionId))
+        .limit(1);
+
+      if (!question) {
+        return res.status(404).send("Selected question not found");
       }
 
       const [session] = await db.insert(sessions)
         .values({
-          title: req.body.title,
-          description: req.body.description,
+          title,
+          description: description || null,
           teacherId: req.user.id,
-          questionId: req.body.questionId
+          questionId,
+          isActive: true
         })
         .returning();
 
       res.json(session);
     } catch (error) {
-      res.status(500).send("Failed to create session");
+      console.error("Session creation error:", error);
+      res.status(500).send(error instanceof Error ? error.message : "Failed to create session");
     }
   });
 

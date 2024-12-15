@@ -77,22 +77,43 @@ export default function TeacherDashboard() {
 
   const createQuestion = useMutation({
     mutationFn: async (questionData: typeof newQuestion) => {
+      const formattedTestCases = questionData.testCases.map(tc => ({
+        input: tc.input.trim(),
+        expected: tc.expected.trim()
+      }));
+
+      console.log("Sending question data:", {
+        ...questionData,
+        testCases: formattedTestCases
+      });
+
       const res = await fetch("/api/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          ...questionData,
-          testCases: questionData.testCases,
+          title: questionData.title.trim(),
+          description: questionData.description.trim(),
+          testCases: formattedTestCases,
         }),
       });
-      if (!res.ok) throw new Error(await res.text());
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Question creation failed:", errorText);
+        throw new Error(errorText);
+      }
+
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/questions"] });
       setIsCreateQuestionOpen(false);
-      setNewQuestion({ title: "", description: "", testCases: "[]" });
+      setNewQuestion({
+        title: "",
+        description: "",
+        testCases: [{ input: "", expected: "" }]
+      });
       toast({
         title: "Success",
         description: "Question created successfully",

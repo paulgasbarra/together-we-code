@@ -55,22 +55,31 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/questions", requireAuth, async (req, res) => {
     try {
-      if (req.user.role !== "teacher") {
+      if (!req.user || req.user.role !== "teacher") {
         return res.status(403).send("Only teachers can create questions");
+      }
+
+      const { title, description, testCases } = req.body;
+      
+      if (!title || !description || !Array.isArray(testCases)) {
+        console.error("Invalid request body:", req.body);
+        return res.status(400).send("Invalid question data. Title, description and test cases are required.");
       }
 
       const [question] = await db.insert(questions)
         .values({
-          title: req.body.title,
-          description: req.body.description,
-          testCases: req.body.testCases,
-          sessionId: null // Questions are now created independently of sessions
+          title,
+          description,
+          testCases,
+          sessionId: null
         })
         .returning();
 
+      console.log("Question created successfully:", question);
       res.json(question);
     } catch (error) {
-      res.status(500).send("Failed to create question");
+      console.error("Error creating question:", error);
+      res.status(500).send(error instanceof Error ? error.message : "Failed to create question");
     }
   });
 

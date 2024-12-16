@@ -26,13 +26,6 @@ import { Loader2, Plus, Users, Code } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface Session {
   id: number;
@@ -67,7 +60,6 @@ export default function TeacherDashboard() {
   const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false);
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
-  
   const [newSession, setNewSession] = useState({
     title: "",
     description: "",
@@ -81,7 +73,7 @@ export default function TeacherDashboard() {
   }>({
     title: "",
     description: "",
-    testCases: [{ input: { "parameter": "" }, output: "" }],
+    testCases: [{ input: { "": "" }, output: "" }],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({
@@ -105,7 +97,10 @@ export default function TeacherDashboard() {
         }),
       });
 
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
       return res.json();
     },
     onSuccess: () => {
@@ -114,7 +109,7 @@ export default function TeacherDashboard() {
       setNewQuestion({
         title: "",
         description: "",
-        testCases: [{ input: { "parameter": "" }, output: "" }],
+        testCases: [{ input: {}, output: "" }],
       });
       toast({
         title: "Success",
@@ -197,7 +192,7 @@ export default function TeacherDashboard() {
   const addTestCase = () => {
     setNewQuestion({
       ...newQuestion,
-      testCases: [...newQuestion.testCases, { input: { "parameter": "" }, output: "" }]
+      testCases: [...newQuestion.testCases, { input: {}, output: "" }]
     });
   };
 
@@ -237,79 +232,65 @@ export default function TeacherDashboard() {
                     Create Session
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Create New Session</DialogTitle>
                     <DialogDescription>
                       Create a new coding session and select a question to use.
                     </DialogDescription>
                   </DialogHeader>
-                  <ScrollArea className="h-[60vh] px-4">
+                  <ScrollArea className="h-[60vh]">
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
                         createSession.mutate(newSession);
                       }}
-                      className="space-y-6"
+                      className="space-y-4"
                     >
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="title">Session Title</Label>
-                          <Input
-                            id="title"
-                            value={newSession.title}
-                            onChange={(e) =>
-                              setNewSession({ ...newSession, title: e.target.value })
-                            }
-                            className="mt-1.5"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="description">Session Description</Label>
-                          <Textarea
-                            id="description"
-                            value={newSession.description}
-                            onChange={(e) =>
-                              setNewSession({ ...newSession, description: e.target.value })
-                            }
-                            className="mt-1.5"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Session Title</Label>
+                        <Input
+                          id="title"
+                          value={newSession.title}
+                          onChange={(e) =>
+                            setNewSession({ ...newSession, title: e.target.value })
+                          }
+                          required
+                        />
                       </div>
-
-                      <div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Session Description</Label>
+                        <Textarea
+                          id="description"
+                          value={newSession.description}
+                          onChange={(e) =>
+                            setNewSession({ ...newSession, description: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
                         <Label>Select Question</Label>
-                        <Select
-                          value={selectedQuestionId?.toString()}
-                          onValueChange={(value) => {
-                            const id = parseInt(value);
-                            setSelectedQuestionId(id);
-                            setNewSession({ ...newSession, questionId: id });
-                          }}
-                        >
-                          <SelectTrigger className="mt-1.5">
-                            <SelectValue placeholder="Choose a question" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {questions?.map((question) => (
-                              <SelectItem key={question.id} value={question.id.toString()}>
-                                {question.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {selectedQuestionId && questions?.find(q => q.id === selectedQuestionId) && (
-                        <div className="rounded-lg border bg-card p-4 text-card-foreground">
-                          <h4 className="font-medium mb-2">Question Preview</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {questions.find(q => q.id === selectedQuestionId)?.description}
-                          </p>
+                        <div className="grid grid-cols-1 gap-4">
+                          {questions?.map((question) => (
+                            <Card
+                              key={question.id}
+                              className={`cursor-pointer transition-all hover:border-primary/50 ${
+                                selectedQuestionId === question.id
+                                  ? "ring-2 ring-primary ring-offset-2"
+                                  : "border-border"
+                              }`}
+                              onClick={() => {
+                                setSelectedQuestionId(question.id);
+                                setNewSession({ ...newSession, questionId: question.id });
+                              }}
+                            >
+                              <CardHeader>
+                                <CardTitle className="text-base">{question.title}</CardTitle>
+                              </CardHeader>
+                            </Card>
+                          ))}
                         </div>
-                      )}
-
+                      </div>
                       <Button type="submit" className="w-full" disabled={!selectedQuestionId}>
                         {createSession.isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -377,53 +358,49 @@ export default function TeacherDashboard() {
                     Create Question
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>Create New Question</DialogTitle>
                     <DialogDescription>
                       Create a new coding question with test cases for your sessions.
                     </DialogDescription>
                   </DialogHeader>
-                  <ScrollArea className="h-[60vh] px-4">
+                  <ScrollArea className="h-[60vh] p-4">
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
                         createQuestion.mutate(newQuestion);
                       }}
-                      className="space-y-6"
+                      className="space-y-4"
                     >
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="questionTitle">Question Title</Label>
-                          <Input
-                            id="questionTitle"
-                            value={newQuestion.title}
-                            onChange={(e) =>
-                              setNewQuestion({ ...newQuestion, title: e.target.value })
-                            }
-                            className="mt-1.5"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="questionDescription">Question Description</Label>
-                          <Textarea
-                            id="questionDescription"
-                            value={newQuestion.description}
-                            onChange={(e) =>
-                              setNewQuestion({ ...newQuestion, description: e.target.value })
-                            }
-                            className="mt-1.5"
-                            required
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="questionTitle">Question Title</Label>
+                        <Input
+                          id="questionTitle"
+                          value={newQuestion.title}
+                          onChange={(e) =>
+                            setNewQuestion({ ...newQuestion, title: e.target.value })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="questionDescription">Question Description</Label>
+                        <Textarea
+                          id="questionDescription"
+                          value={newQuestion.description}
+                          onChange={(e) =>
+                            setNewQuestion({ ...newQuestion, description: e.target.value })
+                          }
+                          required
+                        />
                       </div>
 
                       <div className="space-y-4">
                         <Label>Test Cases</Label>
                         {newQuestion.testCases.map((testCase, testCaseIndex) => (
-                          <div key={testCaseIndex} className="rounded-lg border bg-card p-4 text-card-foreground">
-                            <div className="flex justify-between items-center mb-4">
+                          <div key={testCaseIndex} className="space-y-4 p-4 border rounded-lg">
+                            <div className="flex justify-between items-center">
                               <h4 className="font-medium">Test Case {testCaseIndex + 1}</h4>
                               {newQuestion.testCases.length > 1 && (
                                 <Button
@@ -439,49 +416,51 @@ export default function TeacherDashboard() {
 
                             <div className="space-y-4">
                               <div>
-                                <Label className="mb-2 block">Input Parameters</Label>
+                                <Label>Input Parameters</Label>
                                 {Object.entries(testCase.input).map(([paramName, paramValue], paramIndex) => (
-                                  <div key={paramIndex} className="flex gap-2 items-center mt-2">
-                                    <Input
-                                      placeholder="Parameter name"
-                                      value={paramName}
-                                      onChange={(e) => {
-                                        const newInput = { ...testCase.input };
-                                        const value = newInput[paramName];
-                                        delete newInput[paramName];
-                                        newInput[e.target.value] = value;
-                                        
-                                        const updatedTestCases = [...newQuestion.testCases];
-                                        updatedTestCases[testCaseIndex] = {
-                                          ...testCase,
-                                          input: newInput
-                                        };
-                                        setNewQuestion({
-                                          ...newQuestion,
-                                          testCases: updatedTestCases
-                                        });
-                                      }}
-                                      className="flex-1"
-                                    />
-                                    <Input
-                                      placeholder="Value"
-                                      value={paramValue}
-                                      onChange={(e) => {
-                                        const newInput = { ...testCase.input };
-                                        newInput[paramName] = e.target.value;
-                                        
-                                        const updatedTestCases = [...newQuestion.testCases];
-                                        updatedTestCases[testCaseIndex] = {
-                                          ...testCase,
-                                          input: newInput
-                                        };
-                                        setNewQuestion({
-                                          ...newQuestion,
-                                          testCases: updatedTestCases
-                                        });
-                                      }}
-                                      className="flex-1"
-                                    />
+                                  <div key={paramIndex} className="mt-2 flex gap-2 items-start">
+                                    <div className="flex-1">
+                                      <Input
+                                        placeholder="Parameter name"
+                                        value={paramName}
+                                        onChange={(e) => {
+                                          const newInput = { ...testCase.input };
+                                          const value = newInput[paramName];
+                                          delete newInput[paramName];
+                                          newInput[e.target.value] = value;
+                                          
+                                          const updatedTestCases = [...newQuestion.testCases];
+                                          updatedTestCases[testCaseIndex] = {
+                                            ...testCase,
+                                            input: newInput
+                                          };
+                                          setNewQuestion({
+                                            ...newQuestion,
+                                            testCases: updatedTestCases
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex-1">
+                                      <Input
+                                        placeholder="Value"
+                                        value={paramValue}
+                                        onChange={(e) => {
+                                          const newInput = { ...testCase.input };
+                                          newInput[paramName] = e.target.value;
+                                          
+                                          const updatedTestCases = [...newQuestion.testCases];
+                                          updatedTestCases[testCaseIndex] = {
+                                            ...testCase,
+                                            input: newInput
+                                          };
+                                          setNewQuestion({
+                                            ...newQuestion,
+                                            testCases: updatedTestCases
+                                          });
+                                        }}
+                                      />
+                                    </div>
                                     <Button
                                       type="button"
                                       variant="outline"
@@ -496,14 +475,14 @@ export default function TeacherDashboard() {
                                   type="button"
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => addTestCaseParameter(testCaseIndex)}
                                   className="mt-2"
+                                  onClick={() => addTestCaseParameter(testCaseIndex)}
                                 >
-                                  Add Parameter
+                                  + Add Parameter
                                 </Button>
                               </div>
                               
-                              <div>
+                              <div className="space-y-2">
                                 <Label htmlFor={`output-${testCaseIndex}`}>Expected Output</Label>
                                 <Input
                                   id={`output-${testCaseIndex}`}
@@ -519,20 +498,19 @@ export default function TeacherDashboard() {
                                       testCases: updatedTestCases
                                     });
                                   }}
-                                  className="mt-1.5"
-                                  placeholder="Expected output value"
+                                  placeholder="Example: 3"
                                 />
                               </div>
-                            </div>
 
-                            <div className="mt-4 p-3 bg-muted rounded-md">
-                              <Label className="mb-2 block">Preview</Label>
-                              <pre className="text-sm whitespace-pre-wrap">
-                                {JSON.stringify({
-                                  input: testCase.input,
-                                  output: testCase.output
-                                }, null, 2)}
-                              </pre>
+                              <div className="mt-4 p-3 bg-muted rounded-md">
+                                <Label>Preview:</Label>
+                                <pre className="mt-2 text-sm">
+                                  {JSON.stringify({
+                                    input: testCase.input,
+                                    output: testCase.output
+                                  }, null, 2)}
+                                </pre>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -540,7 +518,7 @@ export default function TeacherDashboard() {
                           type="button"
                           variant="outline"
                           onClick={addTestCase}
-                          className="w-full"
+                          className="mt-4"
                         >
                           Add Test Case
                         </Button>
@@ -570,8 +548,8 @@ export default function TeacherDashboard() {
                       {question.description}
                     </p>
                     <div className="bg-muted rounded-lg p-4">
-                      <Label className="mb-2 block">Test Cases</Label>
-                      <pre className="text-xs whitespace-pre-wrap">
+                      <Label>Test Cases:</Label>
+                      <pre className="text-xs mt-2 overflow-auto">
                         {JSON.stringify(question.testCases, null, 2)}
                       </pre>
                     </div>

@@ -78,17 +78,18 @@ export function registerRoutes(app: Express): Server {
         return res.status(403).send("Only teachers can create questions");
       }
 
-      const { title, description, testCases } = req.body;
+      const { title, description, functionName, testCases } = req.body;
       
-      if (!title || !description || !Array.isArray(testCases)) {
+      if (!title || !description || !functionName || !Array.isArray(testCases)) {
         console.error("Invalid request body:", req.body);
-        return res.status(400).send("Invalid question data. Title, description and test cases are required.");
+        return res.status(400).send("Invalid question data. Title, description, function name and test cases are required.");
       }
 
       const [question] = await db.insert(questions)
         .values({
           title,
           description,
+          functionName,
           testCases
         })
         .returning();

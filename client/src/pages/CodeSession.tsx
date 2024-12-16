@@ -91,8 +91,18 @@ export default function CodeSession() {
     const handleSubmissionResult = (data: {
       questionId: number;
       status: string;
+      results: {
+        testResults: Array<{
+          input: Record<string, any>;
+          expectedOutput: string;
+          actualOutput?: string;
+          error?: string;
+          passed: boolean;
+        }>;
+      };
     }) => {
       if (session?.question && data.questionId === session.question.id) {
+        setTestResults(data.results.testResults);
         toast({
           title: "Test Results",
           description: `Tests ${data.status}`,
@@ -116,12 +126,21 @@ export default function CodeSession() {
     }
   };
 
+  const [testResults, setTestResults] = useState<Array<{
+    input: Record<string, any>;
+    expectedOutput: string;
+    actualOutput?: string;
+    error?: string;
+    passed: boolean;
+  }> | null>(null);
+
   const handleRunTests = () => {
     if (session?.question) {
       submitAnswer({
         sessionId,
         questionId: session.question.id,
         code,
+        language: editorLanguage,
       });
     }
   };
@@ -256,16 +275,70 @@ export default function CodeSession() {
                     <ScrollArea className="h-[calc(100vh-40rem)]">
                       <div className="space-y-4 pr-4">
                         <div>
-                          <h4 className="font-medium mb-2">Test Status</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Run your code to see the test results
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium mb-2">Output</h4>
-                          <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap">
-                            No output yet. Click "Run Tests" to execute your code.
-                          </pre>
+                          <h4 className="font-medium mb-2">Test Results</h4>
+                          {testResults ? (
+                            <div className="space-y-4">
+                              {testResults.map((result, index) => (
+                                <div
+                                  key={index}
+                                  className={`p-4 rounded-lg border ${
+                                    result.passed
+                                      ? "bg-green-50 border-green-200"
+                                      : "bg-red-50 border-red-200"
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-medium">Test Case {index + 1}</h5>
+                                    <span
+                                      className={`px-2 py-1 rounded text-sm ${
+                                        result.passed
+                                          ? "bg-green-100 text-green-800"
+                                          : "bg-red-100 text-red-800"
+                                      }`}
+                                    >
+                                      {result.passed ? "Passed" : "Failed"}
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="space-y-2 text-sm">
+                                    <div>
+                                      <span className="font-medium">Input:</span>
+                                      <pre className="mt-1 p-2 bg-white/50 rounded">
+                                        {JSON.stringify(result.input, null, 2)}
+                                      </pre>
+                                    </div>
+                                    
+                                    <div>
+                                      <span className="font-medium">Expected Output:</span>
+                                      <pre className="mt-1 p-2 bg-white/50 rounded">
+                                        {result.expectedOutput}
+                                      </pre>
+                                    </div>
+                                    
+                                    {result.error ? (
+                                      <div>
+                                        <span className="font-medium text-red-600">Error:</span>
+                                        <pre className="mt-1 p-2 bg-white/50 rounded text-red-600">
+                                          {result.error}
+                                        </pre>
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <span className="font-medium">Actual Output:</span>
+                                        <pre className="mt-1 p-2 bg-white/50 rounded">
+                                          {result.actualOutput}
+                                        </pre>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              Run your code to see the test results
+                            </p>
+                          )}
                         </div>
                       </div>
                     </ScrollArea>

@@ -1,3 +1,49 @@
+import { exec } from 'child_process';
+import { writeFile } from 'fs/promises';
+import { promisify } from 'util';
+import { tmpdir } from 'os';
+import { join } from 'path';
+
+const execAsync = promisify(exec);
+
+async function executeJavaScript(code: string, input: string): Promise<string> {
+  const wrappedCode = `
+    ${code}
+    console.log(solution(${input}));
+  `;
+  
+  const result = await execAsync(`node -e "${wrappedCode}"`);
+  return result.stdout;
+}
+
+async function executePython(code: string, input: string): Promise<string> {
+  const wrappedCode = `
+${code}
+print(solution(${input}))
+`;
+  
+  const tempFile = join(tmpdir(), `${Date.now()}.py`);
+  await writeFile(tempFile, wrappedCode);
+  
+  const result = await execAsync(`python3 ${tempFile}`);
+  return result.stdout;
+}
+
+async function executeTypeScript(code: string, input: string): Promise<string> {
+  const wrappedCode = `
+    ${code}
+    console.log(solution(${input}));
+  `;
+  
+  const tempFile = join(tmpdir(), `${Date.now()}.ts`);
+  await writeFile(tempFile, wrappedCode);
+  
+  await execAsync(`tsc ${tempFile} --esModuleInterop`);
+  const jsFile = tempFile.replace('.ts', '.js');
+  const result = await execAsync(`node ${jsFile}`);
+  return result.stdout;
+}
+
 import { Server as HttpServer } from "http";
 import { Server as SocketServer } from "socket.io";
 import { db } from "@db";
@@ -62,11 +108,68 @@ export function setupWebSocket(server: HttpServer) {
           })
           .returning();
 
-        // TODO: Run tests and update submission status
-        // For now, we'll just mark it as passed
+        // Get question details to run tests
+        const [question] = await db
+          .select()
+          .from(questions)
+          .where(eq(questions.id, data.questionId))
+          .limit(1);
+
+        if (!question) {
+          throw new Error("Question not found");
+        }
+
+        let testResults = [];
+        let allPassed = true;
+
+        // Run each test case
+        for (const testCase of question.testCases) {
+          try {
+            let result;
+            const inputParams = Object.values(testCase.input).join(', ');
+            
+            // Execute code based on language
+            switch(data.language) {
+              case 'javascript':
+                result = await executeJavaScript(data.code, inputParams);
+                break;
+              case 'python':
+                result = await executePython(data.code, inputParams);
+                break;
+              case 'typescript':
+                result = await executeTypeScript(data.code, inputParams);
+                break;
+              default:
+                throw new Error(`Unsupported language: ${data.language}`);
+            }
+
+            const passed = result.trim() === testCase.output.trim();
+            if (!passed) allPassed = false;
+
+            testResults.push({
+              input: testCase.input,
+              expectedOutput: testCase.output,
+              actualOutput: result,
+              passed
+            });
+          } catch (error) {
+            allPassed = false;
+            testResults.push({
+              input: testCase.input,
+              expectedOutput: testCase.output,
+              error: error.message,
+              passed: false
+            });
+          }
+        }
+
+        // Update submission status
         await db
           .update(submissions)
-          .set({ status: "passed", results: { passed: true } })
+          .set({ 
+            status: allPassed ? "passed" : "failed", 
+            results: { testResults } 
+          })
           .where(eq(submissions.id, submission.id));
 
         const roomId = `session-${data.sessionId}`;

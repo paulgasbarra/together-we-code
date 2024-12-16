@@ -169,23 +169,15 @@ export default function CodeSession() {
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
                   <ScrollArea className="h-full">
                     {session?.question && (
-                      <Card className="m-2">
-                        <CardHeader>
-                          <CardTitle>{session.question.title}</CardTitle>
-                          <CardDescription>
-                            {session.question.description}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="bg-muted rounded-lg p-4">
-                            <div className="font-medium mb-2">Test Cases:</div>
-                            <pre className="text-xs mt-2 overflow-auto">
-                              {JSON.stringify(session.question.testCases, null, 2)}
-                            </pre>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
+                          <Card className="m-2">
+                            <CardHeader>
+                              <CardTitle>{session.question.title}</CardTitle>
+                              <CardDescription>
+                                {session.question.description}
+                              </CardDescription>
+                            </CardHeader>
+                          </Card>
+                        )}
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value="chat" className="p-4">

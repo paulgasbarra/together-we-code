@@ -21,6 +21,13 @@ import { useSocket } from "@/hooks/use-socket";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "@/hooks/use-user";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Question {
   id: number;
@@ -49,6 +56,7 @@ export default function CodeSession() {
   const { user } = useUser();
   const { toast } = useToast();
   const [code, setCode] = useState("");
+  const [editorLanguage, setEditorLanguage] = useState("javascript");
   const {
     joinSession,
     updateCode,
@@ -210,7 +218,23 @@ export default function CodeSession() {
               <ResizablePanel defaultSize={50}>
                 <div className="h-full flex flex-col">
                   <div className="border-b p-2 flex justify-between items-center">
-                    <h3 className="font-semibold">Code Editor</h3>
+                    <div className="flex items-center gap-4">
+                      <h3 className="font-semibold">Code Editor</h3>
+                      <Select
+                        defaultValue="javascript"
+                        onValueChange={(value) => setEditorLanguage(value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select Language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="javascript">JavaScript</SelectItem>
+                          <SelectItem value="typescript">TypeScript</SelectItem>
+                          <SelectItem value="python">Python</SelectItem>
+                          <SelectItem value="swift">Swift</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <Button
                       size="sm"
                       onClick={handleRunTests}
@@ -222,7 +246,7 @@ export default function CodeSession() {
                   <div className="flex-1">
                     <Editor
                       height="100%"
-                      defaultLanguage="javascript"
+                      language={editorLanguage}
                       value={code}
                       onChange={handleCodeChange}
                       theme="vs-dark"

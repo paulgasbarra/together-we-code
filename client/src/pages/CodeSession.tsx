@@ -165,15 +165,23 @@ export default function CodeSession() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
-                  <ScrollArea className="h-[calc(100vh-10rem)]">
+                  <ScrollArea className="h-[calc(100vh-10rem)] px-4">
                     {session?.question && (
-                      <Card className="m-2">
+                      <Card>
                         <CardHeader>
                           <CardTitle>{session.question.title}</CardTitle>
-                          <CardDescription>
+                          <CardDescription className="whitespace-pre-wrap">
                             {session.question.description}
                           </CardDescription>
                         </CardHeader>
+                        {session.question.testCases && (
+                          <CardContent>
+                            <h4 className="font-medium mb-2">Example Test Cases:</h4>
+                            <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto">
+                              {JSON.stringify(session.question.testCases, null, 2)}
+                            </pre>
+                          </CardContent>
+                        )}
                       </Card>
                     )}
                   </ScrollArea>
@@ -217,19 +225,22 @@ export default function CodeSession() {
                       Run Tests
                     </Button>
                   </div>
-                  <div className="flex-1">
-                    <Editor
-                      height="100%"
-                      language={editorLanguage}
-                      value={code}
-                      onChange={handleCodeChange}
-                      theme="vs-dark"
-                      options={{
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                      }}
-                    />
-                  </div>
+                  <ScrollArea className="flex-1">
+                    <div className="h-full min-h-[300px]">
+                      <Editor
+                        height="100%"
+                        language={editorLanguage}
+                        value={code}
+                        onChange={handleCodeChange}
+                        theme="vs-dark"
+                        options={{
+                          minimap: { enabled: false },
+                          fontSize: 14,
+                          scrollBeyondLastLine: false
+                        }}
+                      />
+                    </div>
+                  </ScrollArea>
                 </div>
               </ResizablePanel>
               <ResizableHandle />
@@ -242,20 +253,22 @@ export default function CodeSession() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Question</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {session?.question?.description}
-                        </p>
+                    <ScrollArea className="h-[calc(100vh-40rem)]">
+                      <div className="space-y-4 pr-4">
+                        <div>
+                          <h4 className="font-medium mb-2">Test Status</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Run your code to see the test results
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">Output</h4>
+                          <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap">
+                            No output yet. Click "Run Tests" to execute your code.
+                          </pre>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Test Cases</h4>
-                        <pre className="bg-muted p-4 rounded-lg text-sm">
-                          {JSON.stringify(session?.question?.testCases, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
+                    </ScrollArea>
                   </CardContent>
                 </Card>
               </ResizablePanel>

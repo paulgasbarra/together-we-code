@@ -274,10 +274,10 @@ export default function TeacherDashboard() {
                           {questions?.map((question) => (
                             <Card
                               key={question.id}
-                              className={`cursor-pointer transition-all hover:border-primary/50 ${
+                              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                                 selectedQuestionId === question.id
-                                  ? "ring-2 ring-primary ring-offset-2"
-                                  : "border-border"
+                                  ? "ring-2 ring-primary ring-offset-2 border-primary"
+                                  : "border hover:border-primary/50"
                               }`}
                               onClick={() => {
                                 setSelectedQuestionId(question.id);
@@ -428,7 +428,7 @@ export default function TeacherDashboard() {
                                           const value = newInput[paramName];
                                           delete newInput[paramName];
                                           newInput[e.target.value] = value;
-                                          
+
                                           const updatedTestCases = [...newQuestion.testCases];
                                           updatedTestCases[testCaseIndex] = {
                                             ...testCase,
@@ -448,7 +448,7 @@ export default function TeacherDashboard() {
                                         onChange={(e) => {
                                           const newInput = { ...testCase.input };
                                           newInput[paramName] = e.target.value;
-                                          
+
                                           const updatedTestCases = [...newQuestion.testCases];
                                           updatedTestCases[testCaseIndex] = {
                                             ...testCase,
@@ -481,7 +481,7 @@ export default function TeacherDashboard() {
                                   + Add Parameter
                                 </Button>
                               </div>
-                              
+
                               <div className="space-y-2">
                                 <Label htmlFor={`output-${testCaseIndex}`}>Expected Output</Label>
                                 <Input
@@ -539,7 +539,10 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {questions?.map((question) => (
-                <Card key={question.id}>
+                <Card
+                  key={question.id}
+                  className="transition-all duration-200 hover:shadow-md border hover:border-primary/50"
+                >
                   <CardHeader>
                     <CardTitle>{question.title}</CardTitle>
                   </CardHeader>

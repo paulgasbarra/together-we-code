@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Users, Code } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Session {
   id: number;
@@ -238,65 +239,67 @@ export default function TeacherDashboard() {
                       Create a new coding session and select a question to use.
                     </DialogDescription>
                   </DialogHeader>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      createSession.mutate(newSession);
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Session Title</Label>
-                      <Input
-                        id="title"
-                        value={newSession.title}
-                        onChange={(e) =>
-                          setNewSession({ ...newSession, title: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Session Description</Label>
-                      <Textarea
-                        id="description"
-                        value={newSession.description}
-                        onChange={(e) =>
-                          setNewSession({ ...newSession, description: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Select Question</Label>
-                      <div className="grid grid-cols-1 gap-4">
-                        {questions?.map((question) => (
-                          <Card
-                            key={question.id}
-                            className={`cursor-pointer transition-colors ${
-                              selectedQuestionId === question.id
-                                ? "border-primary"
-                                : ""
-                            }`}
-                            onClick={() => {
-                              setSelectedQuestionId(question.id);
-                              setNewSession({ ...newSession, questionId: question.id });
-                            }}
-                          >
-                            <CardHeader>
-                              <CardTitle className="text-base">{question.title}</CardTitle>
-                            </CardHeader>
-                          </Card>
-                        ))}
+                  <ScrollArea className="h-[60vh]">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        createSession.mutate(newSession);
+                      }}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Session Title</Label>
+                        <Input
+                          id="title"
+                          value={newSession.title}
+                          onChange={(e) =>
+                            setNewSession({ ...newSession, title: e.target.value })
+                          }
+                          required
+                        />
                       </div>
-                    </div>
-                    <Button type="submit" className="w-full" disabled={!selectedQuestionId}>
-                      {createSession.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Create Session"
-                      )}
-                    </Button>
-                  </form>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Session Description</Label>
+                        <Textarea
+                          id="description"
+                          value={newSession.description}
+                          onChange={(e) =>
+                            setNewSession({ ...newSession, description: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Select Question</Label>
+                        <div className="grid grid-cols-1 gap-4">
+                          {questions?.map((question) => (
+                            <Card
+                              key={question.id}
+                              className={`cursor-pointer transition-colors ${
+                                selectedQuestionId === question.id
+                                  ? "border-primary"
+                                  : ""
+                              }`}
+                              onClick={() => {
+                                setSelectedQuestionId(question.id);
+                                setNewSession({ ...newSession, questionId: question.id });
+                              }}
+                            >
+                              <CardHeader>
+                                <CardTitle className="text-base">{question.title}</CardTitle>
+                              </CardHeader>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                      <Button type="submit" className="w-full" disabled={!selectedQuestionId}>
+                        {createSession.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          "Create Session"
+                        )}
+                      </Button>
+                    </form>
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
             </div>
@@ -362,172 +365,174 @@ export default function TeacherDashboard() {
                       Create a new coding question with test cases for your sessions.
                     </DialogDescription>
                   </DialogHeader>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      createQuestion.mutate(newQuestion);
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="space-y-2">
-                      <Label htmlFor="questionTitle">Question Title</Label>
-                      <Input
-                        id="questionTitle"
-                        value={newQuestion.title}
-                        onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, title: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="questionDescription">Question Description</Label>
-                      <Textarea
-                        id="questionDescription"
-                        value={newQuestion.description}
-                        onChange={(e) =>
-                          setNewQuestion({ ...newQuestion, description: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
+                  <ScrollArea className="h-[60vh] p-4">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        createQuestion.mutate(newQuestion);
+                      }}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="questionTitle">Question Title</Label>
+                        <Input
+                          id="questionTitle"
+                          value={newQuestion.title}
+                          onChange={(e) =>
+                            setNewQuestion({ ...newQuestion, title: e.target.value })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="questionDescription">Question Description</Label>
+                        <Textarea
+                          id="questionDescription"
+                          value={newQuestion.description}
+                          onChange={(e) =>
+                            setNewQuestion({ ...newQuestion, description: e.target.value })
+                          }
+                          required
+                        />
+                      </div>
 
-                    <div className="space-y-4">
-                      <Label>Test Cases</Label>
-                      {newQuestion.testCases.map((testCase, testCaseIndex) => (
-                        <div key={testCaseIndex} className="space-y-4 p-4 border rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-medium">Test Case {testCaseIndex + 1}</h4>
-                            {newQuestion.testCases.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => removeTestCase(testCaseIndex)}
-                              >
-                                Remove Test Case
-                              </Button>
-                            )}
-                          </div>
+                      <div className="space-y-4">
+                        <Label>Test Cases</Label>
+                        {newQuestion.testCases.map((testCase, testCaseIndex) => (
+                          <div key={testCaseIndex} className="space-y-4 p-4 border rounded-lg">
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-medium">Test Case {testCaseIndex + 1}</h4>
+                              {newQuestion.testCases.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => removeTestCase(testCaseIndex)}
+                                >
+                                  Remove Test Case
+                                </Button>
+                              )}
+                            </div>
 
-                          <div className="space-y-4">
-                            <div>
-                              <Label>Input Parameters</Label>
-                              {Object.entries(testCase.input).map(([paramName, paramValue], paramIndex) => (
-                                <div key={paramIndex} className="mt-2 flex gap-2 items-start">
-                                  <div className="flex-1">
-                                    <Input
-                                      placeholder="Parameter name"
-                                      value={paramName}
-                                      onChange={(e) => {
-                                        const newInput = { ...testCase.input };
-                                        const value = newInput[paramName];
-                                        delete newInput[paramName];
-                                        newInput[e.target.value] = value;
-                                        
-                                        const updatedTestCases = [...newQuestion.testCases];
-                                        updatedTestCases[testCaseIndex] = {
-                                          ...testCase,
-                                          input: newInput
-                                        };
-                                        setNewQuestion({
-                                          ...newQuestion,
-                                          testCases: updatedTestCases
-                                        });
-                                      }}
-                                    />
+                            <div className="space-y-4">
+                              <div>
+                                <Label>Input Parameters</Label>
+                                {Object.entries(testCase.input).map(([paramName, paramValue], paramIndex) => (
+                                  <div key={paramIndex} className="mt-2 flex gap-2 items-start">
+                                    <div className="flex-1">
+                                      <Input
+                                        placeholder="Parameter name"
+                                        value={paramName}
+                                        onChange={(e) => {
+                                          const newInput = { ...testCase.input };
+                                          const value = newInput[paramName];
+                                          delete newInput[paramName];
+                                          newInput[e.target.value] = value;
+                                          
+                                          const updatedTestCases = [...newQuestion.testCases];
+                                          updatedTestCases[testCaseIndex] = {
+                                            ...testCase,
+                                            input: newInput
+                                          };
+                                          setNewQuestion({
+                                            ...newQuestion,
+                                            testCases: updatedTestCases
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex-1">
+                                      <Input
+                                        placeholder="Value"
+                                        value={paramValue}
+                                        onChange={(e) => {
+                                          const newInput = { ...testCase.input };
+                                          newInput[paramName] = e.target.value;
+                                          
+                                          const updatedTestCases = [...newQuestion.testCases];
+                                          updatedTestCases[testCaseIndex] = {
+                                            ...testCase,
+                                            input: newInput
+                                          };
+                                          setNewQuestion({
+                                            ...newQuestion,
+                                            testCases: updatedTestCases
+                                          });
+                                        }}
+                                      />
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="icon"
+                                      onClick={() => removeTestCaseParameter(testCaseIndex, paramName)}
+                                    >
+                                      ✕
+                                    </Button>
                                   </div>
-                                  <div className="flex-1">
-                                    <Input
-                                      placeholder="Value"
-                                      value={paramValue}
-                                      onChange={(e) => {
-                                        const newInput = { ...testCase.input };
-                                        newInput[paramName] = e.target.value;
-                                        
-                                        const updatedTestCases = [...newQuestion.testCases];
-                                        updatedTestCases[testCaseIndex] = {
-                                          ...testCase,
-                                          input: newInput
-                                        };
-                                        setNewQuestion({
-                                          ...newQuestion,
-                                          testCases: updatedTestCases
-                                        });
-                                      }}
-                                    />
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => removeTestCaseParameter(testCaseIndex, paramName)}
-                                  >
-                                    ✕
-                                  </Button>
-                                </div>
-                              ))}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="mt-2"
-                                onClick={() => addTestCaseParameter(testCaseIndex)}
-                              >
-                                + Add Parameter
-                              </Button>
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`output-${testCaseIndex}`}>Expected Output</Label>
-                              <Input
-                                id={`output-${testCaseIndex}`}
-                                value={testCase.output}
-                                onChange={(e) => {
-                                  const updatedTestCases = [...newQuestion.testCases];
-                                  updatedTestCases[testCaseIndex] = {
-                                    ...testCase,
-                                    output: e.target.value
-                                  };
-                                  setNewQuestion({
-                                    ...newQuestion,
-                                    testCases: updatedTestCases
-                                  });
-                                }}
-                                placeholder="Example: 3"
-                              />
-                            </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2"
+                                  onClick={() => addTestCaseParameter(testCaseIndex)}
+                                >
+                                  + Add Parameter
+                                </Button>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`output-${testCaseIndex}`}>Expected Output</Label>
+                                <Input
+                                  id={`output-${testCaseIndex}`}
+                                  value={testCase.output}
+                                  onChange={(e) => {
+                                    const updatedTestCases = [...newQuestion.testCases];
+                                    updatedTestCases[testCaseIndex] = {
+                                      ...testCase,
+                                      output: e.target.value
+                                    };
+                                    setNewQuestion({
+                                      ...newQuestion,
+                                      testCases: updatedTestCases
+                                    });
+                                  }}
+                                  placeholder="Example: 3"
+                                />
+                              </div>
 
-                            <div className="mt-4 p-3 bg-muted rounded-md">
-                              <Label>Preview:</Label>
-                              <pre className="mt-2 text-sm">
-                                {JSON.stringify({
-                                  input: testCase.input,
-                                  output: testCase.output
-                                }, null, 2)}
-                              </pre>
+                              <div className="mt-4 p-3 bg-muted rounded-md">
+                                <Label>Preview:</Label>
+                                <pre className="mt-2 text-sm">
+                                  {JSON.stringify({
+                                    input: testCase.input,
+                                    output: testCase.output
+                                  }, null, 2)}
+                                </pre>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addTestCase}
-                        className="mt-4"
-                      >
-                        Add Test Case
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={addTestCase}
+                          className="mt-4"
+                        >
+                          Add Test Case
+                        </Button>
+                      </div>
+
+                      <Button type="submit" className="w-full">
+                        {createQuestion.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          "Create Question"
+                        )}
                       </Button>
-                    </div>
-
-                    <Button type="submit" className="w-full">
-                      {createQuestion.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Create Question"
-                      )}
-                    </Button>
-                  </form>
+                    </form>
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
             </div>
@@ -537,9 +542,6 @@ export default function TeacherDashboard() {
                 <Card key={question.id}>
                   <CardHeader>
                     <CardTitle>{question.title}</CardTitle>
-                    <CardDescription>
-                      Created on {new Date(question.createdAt).toLocaleDateString()}
-                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">

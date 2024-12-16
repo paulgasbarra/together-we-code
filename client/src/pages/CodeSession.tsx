@@ -165,17 +165,17 @@ export default function CodeSession() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="questions" className="h-[calc(100%-40px)]">
-                  <ScrollArea className="h-full">
+                  <ScrollArea className="h-[calc(100vh-10rem)]">
                     {session?.question && (
-                          <Card className="m-2">
-                            <CardHeader>
-                              <CardTitle>{session.question.title}</CardTitle>
-                              <CardDescription>
-                                {session.question.description}
-                              </CardDescription>
-                            </CardHeader>
-                          </Card>
-                        )}
+                      <Card className="m-2">
+                        <CardHeader>
+                          <CardTitle>{session.question.title}</CardTitle>
+                          <CardDescription>
+                            {session.question.description}
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    )}
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value="chat" className="p-4">

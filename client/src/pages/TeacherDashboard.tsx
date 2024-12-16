@@ -57,14 +57,18 @@ export default function TeacherDashboard() {
     questionId: 0,
   });
   interface TestCase {
-    input: string;
-    expected: string;
+    input: Record<string, any>;
+    output: string;
   }
 
-  const [newQuestion, setNewQuestion] = useState({
+  const [newQuestion, setNewQuestion] = useState<{
+    title: string;
+    description: string;
+    testCases: TestCase[];
+  }>({
     title: "",
     description: "",
-    testCases: [{ input: "", expected: "" }] as TestCase[],
+    testCases: [{ input: {}, output: "" }],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({
@@ -77,15 +81,7 @@ export default function TeacherDashboard() {
 
   const createQuestion = useMutation({
     mutationFn: async (questionData: typeof newQuestion) => {
-      const formattedTestCases = questionData.testCases.map(tc => ({
-        input: tc.input.trim(),
-        expected: tc.expected.trim()
-      }));
-
-      console.log("Sending question data:", {
-        ...questionData,
-        testCases: formattedTestCases
-      });
+      console.log("Sending question data:", questionData);
 
       const res = await fetch("/api/questions", {
         method: "POST",
@@ -94,7 +90,10 @@ export default function TeacherDashboard() {
         body: JSON.stringify({
           title: questionData.title.trim(),
           description: questionData.description.trim(),
-          testCases: formattedTestCases,
+          testCases: questionData.testCases.map(tc => ({
+            input: tc.input,
+            output: tc.output
+          })),
         }),
       });
 
@@ -356,19 +355,25 @@ export default function TeacherDashboard() {
                             <Label htmlFor={`input-${index}`}>Input</Label>
                             <Input
                               id={`input-${index}`}
-                              value={testCase.input}
+                              value={JSON.stringify(testCase.input)}
                               onChange={(e) => {
-                                const updatedTestCases = [...newQuestion.testCases];
-                                updatedTestCases[index] = {
-                                  ...testCase,
-                                  input: e.target.value,
-                                };
-                                setNewQuestion({
-                                  ...newQuestion,
-                                  testCases: updatedTestCases,
-                                });
+                                try {
+                                  const inputObj = JSON.parse(e.target.value);
+                                  const updatedTestCases = [...newQuestion.testCases];
+                                  updatedTestCases[index] = {
+                                    ...testCase,
+                                    input: inputObj,
+                                  };
+                                  setNewQuestion({
+                                    ...newQuestion,
+                                    testCases: updatedTestCases,
+                                  });
+                                } catch (error) {
+                                  // If JSON is invalid, just update the string
+                                  console.error("Invalid JSON input");
+                                }
                               }}
-                              placeholder="Example: 5"
+                              placeholder='Example: {"a": 1, "b": 2}'
                               required
                             />
                           </div>
@@ -376,19 +381,19 @@ export default function TeacherDashboard() {
                             <Label htmlFor={`expected-${index}`}>Expected Output</Label>
                             <Input
                               id={`expected-${index}`}
-                              value={testCase.expected}
+                              value={testCase.output}
                               onChange={(e) => {
                                 const updatedTestCases = [...newQuestion.testCases];
                                 updatedTestCases[index] = {
                                   ...testCase,
-                                  expected: e.target.value,
+                                  output: e.target.value,
                                 };
                                 setNewQuestion({
                                   ...newQuestion,
                                   testCases: updatedTestCases,
                                 });
                               }}
-                              placeholder="Example: 120"
+                              placeholder="Example: 3"
                               required
                             />
                           </div>

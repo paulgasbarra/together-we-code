@@ -29,18 +29,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface Question {
-  id: number;
-  title: string;
-  description: string;
-  testCases: any[];
+interface TestCase {
+  input: Record<string, any>;
+  output: string;
 }
 
 interface Question {
   id: number;
   title: string;
   description: string;
-  testCases: any[];
+  testCases: TestCase[];
 }
 
 interface Session {

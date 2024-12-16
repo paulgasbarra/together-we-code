@@ -26,7 +26,7 @@ export const questions = pgTable("questions", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  testCases: json("test_cases").notNull(),
+  testCases: json("test_cases").$type<Array<{ input: Record<string, any>, output: string }>>().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow()
 });
 

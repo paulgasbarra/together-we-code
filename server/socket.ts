@@ -6,20 +6,20 @@ import { join } from 'path';
 
 const execAsync = promisify(exec);
 
-async function executeJavaScript(code: string, input: string): Promise<string> {
+async function executeJavaScript(code: string, functionName: string, input: string): Promise<string> {
   const wrappedCode = `
     ${code}
-    console.log(solution(${input}));
+    console.log(${functionName}(${input}));
   `;
   
   const result = await execAsync(`node -e "${wrappedCode}"`);
   return result.stdout;
 }
 
-async function executePython(code: string, input: string): Promise<string> {
+async function executePython(code: string, functionName: string, input: string): Promise<string> {
   const wrappedCode = `
 ${code}
-print(solution(${input}))
+print(${functionName}(${input}))
 `;
   
   const tempFile = join(tmpdir(), `${Date.now()}.py`);
@@ -29,10 +29,10 @@ print(solution(${input}))
   return result.stdout;
 }
 
-async function executeTypeScript(code: string, input: string): Promise<string> {
+async function executeTypeScript(code: string, functionName: string, input: string): Promise<string> {
   const wrappedCode = `
     ${code}
-    console.log(solution(${input}));
+    console.log(${functionName}(${input}));
   `;
   
   const tempFile = join(tmpdir(), `${Date.now()}.ts`);

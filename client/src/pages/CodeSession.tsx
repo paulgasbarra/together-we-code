@@ -53,6 +53,21 @@ export default function CodeSession() {
   const sessionId = parseInt(id || "0");
   const { user } = useUser();
   const { toast } = useToast();
+  const getInitialCode = (functionName: string, language: string) => {
+    switch (language) {
+      case 'javascript':
+        return `function ${functionName}(parameter1) {\n  // Your code here\n  return;\n}\n`;
+      case 'typescript':
+        return `function ${functionName}(parameter1: any): any {\n  // Your code here\n  return;\n}\n`;
+      case 'python':
+        return `def ${functionName}(parameter1):\n    # Your code here\n    pass\n`;
+      case 'swift':
+        return `func ${functionName}(parameter1: Any) -> Any {\n    // Your code here\n    return\n}\n`;
+      default:
+        return `function ${functionName}(parameter1) {\n  // Your code here\n  return;\n}\n`;
+    }
+  };
+
   const [code, setCode] = useState("");
   const [editorLanguage, setEditorLanguage] = useState("javascript");
   const {
@@ -72,6 +87,12 @@ export default function CodeSession() {
       joinSession(sessionId);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    if (session?.question) {
+      setCode(getInitialCode(session.question.functionName, editorLanguage));
+    }
+  }, [session?.question, editorLanguage]);
 
   useEffect(() => {
     const handleCodeChange = (data: {

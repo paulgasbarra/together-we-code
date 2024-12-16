@@ -69,11 +69,13 @@ export default function TeacherDashboard() {
   const [newQuestion, setNewQuestion] = useState<{
     title: string;
     description: string;
+    functionName: string;
     testCases: TestCase[];
   }>({
     title: "",
     description: "",
-    testCases: [{ input: { "": "" }, output: "" }],
+    functionName: "",
+    testCases: [{ input: { "parameter1": "" }, output: "" }],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({
@@ -373,27 +375,47 @@ export default function TeacherDashboard() {
                       }}
                       className="space-y-4"
                     >
-                      <div className="space-y-2">
-                        <Label htmlFor="questionTitle">Question Title</Label>
-                        <Input
-                          id="questionTitle"
-                          value={newQuestion.title}
-                          onChange={(e) =>
-                            setNewQuestion({ ...newQuestion, title: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="questionDescription">Question Description</Label>
-                        <Textarea
-                          id="questionDescription"
-                          value={newQuestion.description}
-                          onChange={(e) =>
-                            setNewQuestion({ ...newQuestion, description: e.target.value })
-                          }
-                          required
-                        />
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="questionTitle">Question Title</Label>
+                          <Input
+                            id="questionTitle"
+                            value={newQuestion.title}
+                            className="ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            onChange={(e) =>
+                              setNewQuestion({ ...newQuestion, title: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="functionName">Function Name</Label>
+                          <Input
+                            id="functionName"
+                            value={newQuestion.functionName}
+                            className="ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            onChange={(e) =>
+                              setNewQuestion({ ...newQuestion, functionName: e.target.value })
+                            }
+                            placeholder="e.g. calculateSum"
+                            required
+                          />
+                          <p className="text-sm text-muted-foreground">
+                            The name of the function that students will implement
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="questionDescription">Question Description</Label>
+                          <Textarea
+                            id="questionDescription"
+                            value={newQuestion.description}
+                            className="ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            onChange={(e) =>
+                              setNewQuestion({ ...newQuestion, description: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-4">

@@ -73,7 +73,7 @@ export default function TeacherDashboard() {
   }>({
     title: "",
     description: "",
-    testCases: [{ input: {}, output: "" }],
+    testCases: [{ input: { "": "" }, output: "" }],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({

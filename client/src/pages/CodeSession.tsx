@@ -199,23 +199,7 @@ export default function CodeSession() {
           <ResizableHandle />
           <ResizablePanel defaultSize={75}>
             <ResizablePanelGroup direction="vertical">
-              <ResizablePanel defaultSize={50}>
-                <Card className="h-full rounded-none border-0">
-                  <CardHeader>
-                    <CardTitle>{session?.question?.title}</CardTitle>
-                    <CardDescription>
-                      {session?.question?.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <pre className="bg-muted p-4 rounded-lg">
-                      {JSON.stringify(session?.question?.testCases, null, 2)}
-                    </pre>
-                  </CardContent>
-                </Card>
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={50}>
+              <ResizablePanel defaultSize={60}>
                 <div className="h-full flex flex-col">
                   <div className="border-b p-2 flex justify-between items-center">
                     <div className="flex items-center gap-4">
@@ -257,6 +241,33 @@ export default function CodeSession() {
                     />
                   </div>
                 </div>
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={40}>
+                <Card className="h-full rounded-none border-0">
+                  <CardHeader>
+                    <CardTitle>Test Results</CardTitle>
+                    <CardDescription>
+                      Run your code to see test results
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2">Question</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {session?.question?.description}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Test Cases</h4>
+                        <pre className="bg-muted p-4 rounded-lg text-sm">
+                          {JSON.stringify(session?.question?.testCases, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>

@@ -274,10 +274,10 @@ export default function TeacherDashboard() {
                           {questions?.map((question) => (
                             <Card
                               key={question.id}
-                              className={`cursor-pointer transition-colors ${
+                              className={`cursor-pointer transition-all hover:border-primary/50 ${
                                 selectedQuestionId === question.id
-                                  ? "border-primary"
-                                  : ""
+                                  ? "ring-2 ring-primary ring-offset-2"
+                                  : "border-border"
                               }`}
                               onClick={() => {
                                 setSelectedQuestionId(question.id);

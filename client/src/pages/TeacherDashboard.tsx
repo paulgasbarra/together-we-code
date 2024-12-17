@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Users, Code } from "lucide-react";
+import { Loader2, Plus, Users, Code, Pencil, Trash2, Check } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -60,6 +60,8 @@ export default function TeacherDashboard() {
   const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false);
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
+  const [selectedQuestionForDelete, setSelectedQuestionForDelete] = useState<number | null>(null);
+  const [selectedQuestionForEdit, setSelectedQuestionForEdit] = useState<number | null>(null);
   const [newSession, setNewSession] = useState({
     title: "",
     description: "",
@@ -84,6 +86,32 @@ export default function TeacherDashboard() {
 
   const { data: questions, isLoading: isLoadingQuestions } = useQuery<Question[]>({
     queryKey: ["/api/questions"],
+  });
+
+  const deleteQuestion = useMutation({
+    mutationFn: async (questionId: number) => {
+      const res = await fetch(`/api/questions/${questionId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/questions"] });
+      setSelectedQuestionForDelete(null);
+      toast({
+        title: "Success",
+        description: "Question deleted successfully"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   });
 
   const createQuestion = useMutation({
@@ -111,8 +139,10 @@ export default function TeacherDashboard() {
       setNewQuestion({
         title: "",
         description: "",
+        functionName: "",
         testCases: [{ input: {}, output: "" }],
       });
+      setSelectedQuestionForEdit(null);
       toast({
         title: "Success",
         description: "Question created successfully",
@@ -577,6 +607,48 @@ export default function TeacherDashboard() {
                       <pre className="text-xs mt-2 overflow-auto">
                         {JSON.stringify(question.testCases, null, 2)}
                       </pre>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setNewQuestion({
+                            title: question.title,
+                            description: question.description,
+                            functionName: question.functionName,
+                            testCases: question.testCases,
+                          });
+                          setSelectedQuestionForEdit(question.id);
+                          setIsCreateQuestionOpen(true);
+                        }}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          if (selectedQuestionForDelete === question.id) {
+                            deleteQuestion.mutate(question.id);
+                          } else {
+                            setSelectedQuestionForDelete(question.id);
+                          }
+                        }}
+                      >
+                        {selectedQuestionForDelete === question.id ? (
+                          <>
+                            <Check className="h-4 w-4 mr-2" />
+                            Confirm Delete
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

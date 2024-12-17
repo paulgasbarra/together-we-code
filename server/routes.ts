@@ -72,6 +72,32 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.delete("/api/questions/:id", requireAuth, async (req, res) => {
+    try {
+      if (!req.user || req.user.role !== "teacher") {
+        return res.status(403).send("Only teachers can delete questions");
+      }
+
+      const questionId = parseInt(req.params.id);
+      const [question] = await db
+        .select()
+        .from(questions)
+        .where(eq(questions.id, questionId))
+        .limit(1);
+
+      if (!question) {
+        return res.status(404).send("Question not found");
+      }
+
+      await db.delete(questions).where(eq(questions.id, questionId));
+
+      res.json({ message: "Question deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      res.status(500).send(error instanceof Error ? error.message : "Failed to delete question");
+    }
+  });
+
   app.post("/api/questions", requireAuth, async (req, res) => {
     try {
       if (!req.user || req.user.role !== "teacher") {

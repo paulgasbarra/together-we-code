@@ -393,12 +393,12 @@ export default function TeacherDashboard() {
                 <DialogContent className="max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>
-                      {selectedQuestionForEdit !== null ? "Edit Question" : "Create New Question"}
+                      {selectedQuestionForEdit === null ? "Create New Question" : "Edit Question"}
                     </DialogTitle>
                     <DialogDescription>
-                      {selectedQuestionForEdit !== null
-                        ? "Edit the existing question and its test cases."
-                        : "Create a new coding question with test cases for your sessions."}
+                      {selectedQuestionForEdit === null
+                        ? "Create a new coding question with test cases for your sessions."
+                        : "Edit the existing question and its test cases."}
                     </DialogDescription>
                   </DialogHeader>
                   <ScrollArea className="h-[60vh] p-4">
@@ -583,10 +583,10 @@ export default function TeacherDashboard() {
                       <Button type="submit" className="w-full">
                         {createQuestion.isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : selectedQuestionForEdit !== null ? (
-                          'Save Changes'
+                        ) : selectedQuestionForEdit === null ? (
+                          "Create Question"
                         ) : (
-                          'Create Question'
+                          "Save Changes"
                         )}
                       </Button>
                     </form>

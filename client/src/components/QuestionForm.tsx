@@ -31,12 +31,12 @@ interface QuestionFormProps {
 }
 
 export function QuestionForm({ initialData, isEdit, isPending, onSubmit }: QuestionFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     title: initialData?.title ?? "",
     description: initialData?.description ?? "",
     functionName: initialData?.functionName ?? "",
-    testCases: initialData?.testCases ?? [{ input: { "": "" }, output: "" }],
-  });
+    testCases: initialData?.testCases ?? [{ input: { "parameter1": "" }, output: "" }],
+  }));
 
   const addTestCaseParameter = (testCaseIndex: number) => {
     const updatedTestCases = [...formData.testCases];

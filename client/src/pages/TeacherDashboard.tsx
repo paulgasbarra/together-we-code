@@ -288,12 +288,6 @@ export default function TeacherDashboard() {
                   question={question}
                   selectedQuestionForDelete={selectedQuestionForDelete}
                   onEdit={(question) => {
-                    setNewQuestion({
-                      title: question.title,
-                      description: question.description,
-                      functionName: question.functionName,
-                      testCases: question.testCases,
-                    });
                     setSelectedQuestionForEdit(question.id);
                     setIsCreateQuestionOpen(true);
                   }}

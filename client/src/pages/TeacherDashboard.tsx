@@ -10,17 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import { SessionForm } from "@/components/SessionForm";
 
 // Custom Components
 import { QuestionCard } from "@/components/QuestionCard";
@@ -251,75 +244,11 @@ export default function TeacherDashboard() {
                     Create Session
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Session</DialogTitle>
-                    <DialogDescription>
-                      Create a new coding session and select a question to use.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ScrollArea className="h-[60vh]">
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        createSession.mutate(newSession);
-                      }}
-                      className="space-y-4"
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Session Title</Label>
-                        <Input
-                          id="title"
-                          value={newSession.title}
-                          onChange={(e) =>
-                            setNewSession({ ...newSession, title: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Session Description</Label>
-                        <Textarea
-                          id="description"
-                          value={newSession.description}
-                          onChange={(e) =>
-                            setNewSession({ ...newSession, description: e.target.value })
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Select Question</Label>
-                        <div className="grid grid-cols-1 gap-4">
-                          {questions?.map((question) => (
-                            <Card
-                              key={question.id}
-                              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                                selectedQuestionId === question.id
-                                  ? "ring-2 ring-primary ring-offset-2 border-primary"
-                                  : "border hover:border-primary/50"
-                              }`}
-                              onClick={() => {
-                                setSelectedQuestionId(question.id);
-                                setNewSession({ ...newSession, questionId: question.id });
-                              }}
-                            >
-                              <CardHeader>
-                                <CardTitle className="text-base">{question.title}</CardTitle>
-                              </CardHeader>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                      <Button type="submit" className="w-full" disabled={!selectedQuestionId}>
-                        {createSession.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          "Create Session"
-                        )}
-                      </Button>
-                    </form>
-                  </ScrollArea>
-                </DialogContent>
+                <SessionForm
+                  questions={questions || []}
+                  isPending={createSession.isPending}
+                  onSubmit={(data) => createSession.mutate(data)}
+                />
               </Dialog>
             </div>
 

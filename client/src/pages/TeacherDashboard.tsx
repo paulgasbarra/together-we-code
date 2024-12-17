@@ -22,10 +22,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Users, Code, Pencil, Trash2, Check } from "lucide-react";
+import { Loader2, Plus, Users, Code } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { QuestionCard } from "@/components/QuestionCard";
 
 interface Session {
   id: number;
@@ -40,17 +41,7 @@ interface Session {
   };
 }
 
-interface TestCase {
-  input: Record<string, string>;
-  output: string;
-}
-
-interface Question {
-  id: number;
-  title: string;
-  description: string;
-  testCases: TestCase[];
-}
+import type { Question, TestCase } from "@/components/QuestionCard";
 
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
@@ -393,12 +384,12 @@ export default function TeacherDashboard() {
                 <DialogContent className="max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>
-                      {selectedQuestionForEdit === null ? "Create New Question" : "Edit Question"}
+                      {selectedQuestionForEdit ? "Edit Question" : "Create New Question"}
                     </DialogTitle>
                     <DialogDescription>
-                      {selectedQuestionForEdit === null
-                        ? "Create a new coding question with test cases for your sessions."
-                        : "Edit the existing question and its test cases."}
+                      {selectedQuestionForEdit
+                        ? "Edit the existing question and its test cases."
+                        : "Create a new coding question with test cases for your sessions."}
                     </DialogDescription>
                   </DialogHeader>
                   <ScrollArea className="h-[60vh] p-4">
@@ -597,67 +588,23 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {questions?.map((question) => (
-                <Card
+                <QuestionCard
                   key={question.id}
-                  className="transition-all duration-200 hover:shadow-md border hover:border-primary/50"
-                >
-                  <CardHeader>
-                    <CardTitle>{question.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {question.description}
-                    </p>
-                    <div className="bg-muted rounded-lg p-4">
-                      <Label>Test Cases:</Label>
-                      <pre className="text-xs mt-2 overflow-auto">
-                        {JSON.stringify(question.testCases, null, 2)}
-                      </pre>
-                    </div>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setNewQuestion({
-                            title: question.title,
-                            description: question.description,
-                            functionName: question.functionName,
-                            testCases: question.testCases,
-                          });
-                          setSelectedQuestionForEdit(question.id);
-                          setIsCreateQuestionOpen(true);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          if (selectedQuestionForDelete === question.id) {
-                            deleteQuestion.mutate(question.id);
-                          } else {
-                            setSelectedQuestionForDelete(question.id);
-                          }
-                        }}
-                      >
-                        {selectedQuestionForDelete === question.id ? (
-                          <>
-                            <Check className="h-4 w-4 mr-2" />
-                            Confirm Delete
-                          </>
-                        ) : (
-                          <>
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  question={question}
+                  selectedQuestionForDelete={selectedQuestionForDelete}
+                  onEdit={(question) => {
+                    setNewQuestion({
+                      title: question.title,
+                      description: question.description,
+                      functionName: question.functionName,
+                      testCases: question.testCases,
+                    });
+                    setSelectedQuestionForEdit(question.id);
+                    setIsCreateQuestionOpen(true);
+                  }}
+                  onDelete={(questionId) => setSelectedQuestionForDelete(questionId)}
+                  onDeleteConfirm={(questionId) => deleteQuestion.mutate(questionId)}
+                />
               ))}
             </div>
           </div>

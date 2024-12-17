@@ -177,7 +177,8 @@ export function setupWebSocket(server: HttpServer) {
           submissionId: submission.id,
           questionId: data.questionId,
           userId: data.userId,
-          status: "passed"
+          status: allPassed ? "passed" : "failed",
+          results: { testResults }
         });
       } catch (error) {
         console.error("Submission error:", error);

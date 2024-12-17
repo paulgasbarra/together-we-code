@@ -40,7 +40,12 @@ export function setupAuth(app: Express) {
     secret: process.env.REPL_ID || "code-collab-secret",
     resave: false,
     saveUninitialized: false,
-    cookie: {},
+    rolling: true,
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,
+      sameSite: 'lax'
+    },
     store: new MemoryStore({
       checkPeriod: 86400000,
     }),

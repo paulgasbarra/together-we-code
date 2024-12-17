@@ -393,10 +393,10 @@ export default function TeacherDashboard() {
                 <DialogContent className="max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>
-                      {selectedQuestionForEdit ? "Edit Question" : "Create New Question"}
+                      {selectedQuestionForEdit !== null ? "Edit Question" : "Create New Question"}
                     </DialogTitle>
                     <DialogDescription>
-                      {selectedQuestionForEdit
+                      {selectedQuestionForEdit !== null
                         ? "Edit the existing question and its test cases."
                         : "Create a new coding question with test cases for your sessions."}
                     </DialogDescription>

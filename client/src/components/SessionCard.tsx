@@ -10,18 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Code, Users } from "lucide-react";
 
-export interface Session {
-  id: number;
-  title: string;
-  description: string | null;
-  teacherId: number;
-  isActive: boolean;
-  createdAt: string;
-  question: {
-    id: number;
-    title: string;
-  };
-}
+import { Session } from "@/types";
 
 interface SessionCardProps {
   session: Session;

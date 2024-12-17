@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
-import type { TestCase } from "./QuestionCard";
+import type { TestCase } from "@/types";
 
 interface QuestionFormProps {
   initialData?: {

@@ -28,8 +28,7 @@ import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
 
 // Types
-import type { Question, TestCase } from "@/components/QuestionCard";
-import type { Session } from "@/components/SessionCard";
+import type { Question, TestCase, Session } from "@/types";
 
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
@@ -56,7 +55,7 @@ export default function TeacherDashboard() {
     title: "",
     description: "",
     functionName: "",
-    testCases: [{ input: { "parameter1": "" }, output: "" }],
+    testCases: [{ input: { "": "" }, output: "" }],
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery<Session[]>({

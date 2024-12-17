@@ -8,19 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Pencil, Trash2, Check } from "lucide-react";
 
-export interface TestCase {
-  input: Record<string, string>;
-  output: string;
-}
-
-export interface Question {
-  id: number;
-  title: string;
-  description: string;
-  functionName: string;
-  testCases: TestCase[];
-  createdAt?: string;
-}
+import { Question, TestCase } from "@/types";
 
 export interface QuestionCardProps {
   question: Question;

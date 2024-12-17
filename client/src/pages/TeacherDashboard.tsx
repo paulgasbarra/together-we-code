@@ -1,15 +1,13 @@
+// React and routing
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
+// Query management
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+
+// UI Components
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -18,31 +16,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Users, Code } from "lucide-react";
-import { useUser } from "@/hooks/use-user";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+
+// Custom Components
 import { QuestionCard } from "@/components/QuestionCard";
 import { QuestionForm } from "@/components/QuestionForm";
+import { SessionCard } from "@/components/SessionCard";
 
-interface Session {
-  id: number;
-  title: string;
-  description: string | null;
-  teacherId: number;
-  isActive: boolean;
-  createdAt: string;
-  question: {
-    id: number;
-    title: string;
-  };
-}
+// Icons
+import { Plus, Loader2 } from "lucide-react";
 
+// Hooks
+import { useUser } from "@/hooks/use-user";
+import { useToast } from "@/hooks/use-toast";
+
+// Types
 import type { Question, TestCase } from "@/components/QuestionCard";
+import type { Session } from "@/components/SessionCard";
 
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
@@ -115,6 +109,7 @@ export default function TeacherDashboard() {
         body: JSON.stringify({
           title: questionData.title.trim(),
           description: questionData.description.trim(),
+          functionName: questionData.functionName.trim(),
           testCases: questionData.testCases,
         }),
       });
@@ -330,43 +325,7 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sessions?.map((session) => (
-                <Card key={session.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{session.title}</CardTitle>
-                    <CardDescription>
-                      Created on {new Date(session.createdAt).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {session.description || "No description provided"}
-                    </p>
-                    {session.question && (
-                      <div className="bg-muted rounded p-2">
-                        <p className="font-medium">Selected Question:</p>
-                        <p className="text-sm text-muted-foreground">
-                          {session.question.title}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setLocation(`/session/${session.id}`)}
-                    >
-                      <Code className="h-4 w-4 mr-2" />
-                      View Session
-                    </Button>
-                    <Button
-                      variant="default"
-                      onClick={() => setLocation(`/session/${session.id}`)}
-                    >
-                      <Users className="h-4 w-4 mr-2" />
-                      Enter Session
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <SessionCard key={session.id} session={session} />
               ))}
             </div>
           </div>

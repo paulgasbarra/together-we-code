@@ -35,7 +35,7 @@ export function QuestionForm({ initialData, isEdit, isPending, onSubmit }: Quest
     title: initialData?.title ?? "",
     description: initialData?.description ?? "",
     functionName: initialData?.functionName ?? "",
-    testCases: initialData?.testCases ?? [{ input: { "parameter1": "" }, output: "" }],
+    testCases: initialData?.testCases ?? [{ input: { "": "" }, output: "" }],
   });
 
   const addTestCaseParameter = (testCaseIndex: number) => {

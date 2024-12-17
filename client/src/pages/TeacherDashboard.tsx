@@ -271,12 +271,7 @@ export default function TeacherDashboard() {
                   </Button>
                 </DialogTrigger>
                 <QuestionForm
-                  initialData={selectedQuestionForEdit ? {
-                    title: newQuestion.title,
-                    description: newQuestion.description,
-                    functionName: newQuestion.functionName,
-                    testCases: newQuestion.testCases,
-                  } : undefined}
+                  initialData={selectedQuestionForEdit ? questions?.find(q => q.id === selectedQuestionForEdit) : undefined}
                   isEdit={selectedQuestionForEdit !== null}
                   isPending={createQuestion.isPending}
                   onSubmit={(data) => {

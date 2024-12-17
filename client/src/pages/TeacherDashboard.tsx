@@ -28,16 +28,15 @@ import { useUser } from "@/hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
 
 // Types
-import type { Question, TestCase, Session } from "@/types";
+import {TestCase} from "@/types/question";
 
 export default function TeacherDashboard() {
-  const [, setLocation] = useLocation();
+  const [setLocation] = useLocation();
   const { user } = useUser();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false);
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
-  const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
   const [selectedQuestionForDelete, setSelectedQuestionForDelete] = useState<number | null>(null);
   const [selectedQuestionForEdit, setSelectedQuestionForEdit] = useState<number | null>(null);
   const [newSession, setNewSession] = useState({
@@ -172,49 +171,6 @@ export default function TeacherDashboard() {
       </div>
     );
   }
-
-  const addTestCaseParameter = (testCaseIndex: number) => {
-    const updatedTestCases = [...newQuestion.testCases];
-    const currentInput = updatedTestCases[testCaseIndex].input;
-    updatedTestCases[testCaseIndex] = {
-      ...updatedTestCases[testCaseIndex],
-      input: { ...currentInput, "": "" }
-    };
-    setNewQuestion({
-      ...newQuestion,
-      testCases: updatedTestCases
-    });
-  };
-
-  const removeTestCaseParameter = (testCaseIndex: number, paramName: string) => {
-    const updatedTestCases = [...newQuestion.testCases];
-    const newInput = { ...updatedTestCases[testCaseIndex].input };
-    delete newInput[paramName];
-    updatedTestCases[testCaseIndex] = {
-      ...updatedTestCases[testCaseIndex],
-      input: newInput
-    };
-    setNewQuestion({
-      ...newQuestion,
-      testCases: updatedTestCases
-    });
-  };
-
-  const addTestCase = () => {
-    setNewQuestion({
-      ...newQuestion,
-      testCases: [...newQuestion.testCases, { input: {}, output: "" }]
-    });
-  };
-
-  const removeTestCase = (index: number) => {
-    if (newQuestion.testCases.length > 1) {
-      setNewQuestion({
-        ...newQuestion,
-        testCases: newQuestion.testCases.filter((_, i) => i !== index)
-      });
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
